@@ -1,0 +1,127 @@
+annazocher=# CREATE DATABASE testdb;
+CREATE DATABASE
+annazocher=# \l
+                                List of databases
+    Name    |   Owner    | Encoding | Collate | Ctype |     Access privileges     
+------------+------------+----------+---------+-------+---------------------------
+ annazocher | annazocher | UTF8     | C       | C     | 
+ postgres   | annazocher | UTF8     | C       | C     | 
+ template0  | annazocher | UTF8     | C       | C     | =c/annazocher            +
+            |            |          |         |       | annazocher=CTc/annazocher
+ template1  | annazocher | UTF8     | C       | C     | =c/annazocher            +
+            |            |          |         |       | annazocher=CTc/annazocher
+ testdb     | annazocher | UTF8     | C       | C     | 
+(5 rows)
+
+annazocher=# \connect testdb
+You are now connected to database "testdb" as user "annazocher".
+testdb=# \q
+(base) C02Z79DQLVDC:~ annazocher$ psql
+psql (13.3)
+Type "help" for help.
+
+annazocher=# \l
+                                List of databases
+    Name    |   Owner    | Encoding | Collate | Ctype |     Access privileges     
+------------+------------+----------+---------+-------+---------------------------
+ annazocher | annazocher | UTF8     | C       | C     | 
+ postgres   | annazocher | UTF8     | C       | C     | 
+ template0  | annazocher | UTF8     | C       | C     | =c/annazocher            +
+            |            |          |         |       | annazocher=CTc/annazocher
+ template1  | annazocher | UTF8     | C       | C     | =c/annazocher            +
+            |            |          |         |       | annazocher=CTc/annazocher
+ testdb     | annazocher | UTF8     | C       | C     | 
+(5 rows)
+
+annazocher=# \connect testdb
+You are now connected to database "testdb" as user "annazocher".
+testdb=# \dt
+Did not find any relations.
+testdb=# CREATE TABLE students (
+testdb(# id SERIAL PRIMARY KEY,
+testdb(# name TEXT,
+testdb(# phone VARCHAR(15),
+testdb(# email TEXT
+testdb(# );
+CREATE TABLE
+testdb=# \dt
+           List of relations
+ Schema |   Name   | Type  |   Owner    
+--------+----------+-------+------------
+ public | students | table | annazocher
+(1 row)
+
+testdb=# INSERT INTO students
+testdb-# (name, phone, email)
+testdb-# VALUES
+testdb-# ('William Smith', '(415)555-5555', 'bill@example.com');
+INSERT 0 1
+testdb=# INSERT INTO students (name, phone, email) VALUES ('Bob Jones', '(415)555-5555', 'bob@example.com');
+INSERT 0 1
+testdb=# INSERT INTO students (name, phone, email) VALUES ('Bob Jones', '(415)555-5555', 'bob@example.com';
+testdb(# ;
+testdb(# ^C
+testdb=# \dt
+           List of relations
+ Schema |   Name   | Type  |   Owner    
+--------+----------+-------+------------
+ public | students | table | annazocher
+(1 row)
+
+testdb=# SELECT * FROM students;
+ id |     name      |     phone     |      email       
+----+---------------+---------------+------------------
+  1 | William Smith | (415)555-5555 | bill@example.com
+  2 | Bob Jones     | (415)555-5555 | bob@example.com
+(2 rows)
+
+testdb=# SELECT * FROM students WHERE name='Bob Jones';  
+ id |   name    |     phone     |      email      
+----+-----------+---------------+-----------------
+  2 | Bob Jones | (415)555-5555 | bob@example.com
+(1 row)
+
+testdb=# INSERT INTO students (name, phone, email) VALUES ('Boby Jones', '(415)555-5555', 'boby@example.com');
+INSERT 0 1
+testdb=# SELECT * FROM students;
+ id |     name      |     phone     |      email       
+----+---------------+---------------+------------------
+  1 | William Smith | (415)555-5555 | bill@example.com
+  2 | Bob Jones     | (415)555-5555 | bob@example.com
+  3 | Boby Jones    | (415)555-5555 | boby@example.com
+(3 rows)
+
+testdb=# SELECT * FROM students WHERE name='B%';
+ id | name | phone | email 
+----+------+-------+-------
+(0 rows)
+
+testdb=# SELECT * FROM students WHERE name LIKE 'B%';
+ id |    name    |     phone     |      email       
+----+------------+---------------+------------------
+  2 | Bob Jones  | (415)555-5555 | bob@example.com
+  3 | Boby Jones | (415)555-5555 | boby@example.com
+(2 rows)
+
+testdb=# SELECT * FROM students WHERE name LIKE '%b%';
+ id |    name    |     phone     |      email       
+----+------------+---------------+------------------
+  2 | Bob Jones  | (415)555-5555 | bob@example.com
+  3 | Boby Jones | (415)555-5555 | boby@example.com
+(2 rows)
+
+testdb=# SELECT * FROM students WHERE email LIKE '%example%';
+ id |     name      |     phone     |      email       
+----+---------------+---------------+------------------
+  1 | William Smith | (415)555-5555 | bill@example.com
+  2 | Bob Jones     | (415)555-5555 | bob@example.com
+  3 | Boby Jones    | (415)555-5555 | boby@example.com
+(3 rows)
+
+testdb=# SELECT name FROM students WHERE phone LIKE '(415)%';
+     name      
+---------------
+ William Smith
+ Bob Jones
+ Boby Jones
+(3 rows)
