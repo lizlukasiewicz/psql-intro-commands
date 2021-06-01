@@ -1,0 +1,137 @@
+(base) C02Z79DQLVDC:psql-intro-lesson-commands annazocher$ psql
+psql (13.3)
+Type "help" for help.
+
+annazocher=# \l
+                                List of databases
+    Name    |   Owner    | Encoding | Collate | Ctype |     Access privileges     
+------------+------------+----------+---------+-------+---------------------------
+ annazocher | annazocher | UTF8     | C       | C     | 
+ postgres   | annazocher | UTF8     | C       | C     | 
+ template0  | annazocher | UTF8     | C       | C     | =c/annazocher            +
+            |            |          |         |       | annazocher=CTc/annazocher
+ template1  | annazocher | UTF8     | C       | C     | =c/annazocher            +
+            |            |          |         |       | annazocher=CTc/annazocher
+ testdb     | annazocher | UTF8     | C       | C     | 
+(5 rows)
+
+annazocher=# SELECT * from students;
+ERROR:  relation "students" does not exist
+LINE 1: SELECT * from students;
+                      ^
+annazocher=# \connect testdb
+You are now connected to database "testdb" as user "annazocher".
+testdb=# SELECT * from students;
+ id |     name      |     phone     |      email       
+----+---------------+---------------+------------------
+  1 | William Smith | (415)555-5555 | bill@example.com
+  2 | Bob Jones     | (415)555-5555 | bob@example.com
+  3 | Boby Jones    | (415)555-5555 | boby@example.com
+(3 rows)
+
+testdb=# \dt
+           List of relations
+ Schema |   Name   | Type  |   Owner    
+--------+----------+-------+------------
+ public | students | table | annazocher
+(1 row)
+
+testdb=# UPDATE students SET email='boby@ga.co' WHERE name='Boby Jones';
+UPDATE 1
+testdb=# SELECT email FROM students WHERE name='Boby Jones';
+   email    
+------------
+ boby@ga.co
+(1 row)
+
+testdb=# DELETE FROM students WHERE email LIKE '%ga%';
+DELETE 1
+testdb=# SELECT * FROM students;
+ id |     name      |     phone     |      email       
+----+---------------+---------------+------------------
+  1 | William Smith | (415)555-5555 | bill@example.com
+  2 | Bob Jones     | (415)555-5555 | bob@example.com
+(2 rows)
+
+testdb=# \d students
+                                   Table "public.students"
+ Column |         Type          | Collation | Nullable |               Default                
+--------+-----------------------+-----------+----------+--------------------------------------
+ id     | integer               |           | not null | nextval('students_id_seq'::regclass)
+ name   | text                  |           |          | 
+ phone  | character varying(15) |           |          | 
+ email  | text                  |           |          | 
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (id)
+
+testdb=# \dt
+           List of relations
+ Schema |   Name   | Type  |   Owner    
+--------+----------+-------+------------
+ public | students | table | annazocher
+(1 row)
+
+testdb=# CREATE TABLE cities (
+testdb(# id SERIAL PRIMARY KEY,
+testdb(# city TEXT,
+testdb(# phone VARCHAR(15)
+testdb(# );
+CREATE TABLE
+testdb=# INSERT INTO cities
+testdb-# (city, phone)
+testdb-# VALUES
+testdb-# ('SQLCity', '(415)555-5555')
+testdb-# ;
+INSERT 0 1
+testdb=# INSET INTO cities
+testdb-# (city, phone)
+testdb-# VALUES
+testdb-# ;
+ERROR:  syntax error at or near "INSET"
+LINE 1: INSET INTO cities
+        ^
+testdb=# INSERT INTO cities
+testdb-# (city, phone)
+testdb-# VALUES
+testdb-# ('MongoCity', '(222)222-2222')
+testdb-# ;
+INSERT 0 1
+testdb=# SELECT * from cities;
+ id |   city    |     phone     
+----+-----------+---------------
+  1 | SQLCity   | (415)555-5555
+  2 | MongoCity | (222)222-2222
+(2 rows)
+
+testdb=# SELECT * from cities WHERE city='MongoCity' AND phone='(222)222-2222';
+ id |   city    |     phone     
+----+-----------+---------------
+  2 | MongoCity | (222)222-2222
+(1 row)
+
+testdb=# SELECT * from cities WHERE city='MongoCity' AND phone LIKE '(222)%';
+ id |   city    |     phone     
+----+-----------+---------------
+  2 | MongoCity | (222)222-2222
+(1 row)
+
+testdb=# \dt
+           List of relations
+ Schema |   Name   | Type  |   Owner    
+--------+----------+-------+------------
+ public | cities   | table | annazocher
+ public | students | table | annazocher
+(2 rows)
+
+testdb=# SELECT *
+testdb-# FROM students
+testdb-# FULL OUTER JOIN cities
+testdb-# ON students.phone=cities.phone;
+ id |     name      |     phone     |      email       | id |   city    |     phone     
+----+---------------+---------------+------------------+----+-----------+---------------
+  2 | Bob Jones     | (415)555-5555 | bob@example.com  |  1 | SQLCity   | (415)555-5555
+  1 | William Smith | (415)555-5555 | bill@example.com |  1 | SQLCity   | (415)555-5555
+    |               |               |                  |  2 | MongoCity | (222)222-2222
+(3 rows)
+
+testdb=# 
